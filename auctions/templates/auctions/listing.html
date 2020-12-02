@@ -6,9 +6,10 @@
     <h2>Listing: {{listing.title}}
 
 
-    {% ifequal listing.username user.username %}
+    {% if listing.username == user.username and listing.closed is False%}
     <a type="button" class="btn btn-outline-danger" href="{% url 'close' listing.id %}">Close Bidding</a>
-    {%else%}
+
+    {%endif%}
         {%if watch_list is False%}
         <a type="button" class="btn btn-outline-info" href="{% url 'add_watchlist' listing.id %}">Add to WatchList</a>
 
@@ -16,7 +17,6 @@
         <a type="button" class="btn btn-outline-danger" href="{% url 'remove_watchlist' listing.id %}">Remove from WatchList</a>
         {%endif%}
         </h2>
-    {%endifequal%}
 
 
 
@@ -53,9 +53,15 @@
             <strong>Congratulations!</strong> You have won the auction!
              </div>
         {% else %}
-        <div class="alert alert-danger">
-        <strong>Sorry!</strong> The Bidding has been closed for this item.
-        </div>
+        {% ifequal user.username listing.username%}
+            <div class="alert alert-secondary">
+            You have closed the bidding for this item
+            </div>
+        {%else%}
+            <div class="alert alert-danger">
+            <strong>Sorry!</strong> The Bidding has been closed for this item.
+            </div>
+        {% endifequal%}
         {% endifequal %}
     {% endif %}
 

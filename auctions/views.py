@@ -10,53 +10,9 @@ import datetime
 from django.db.models import *
 
 from .models import User, Listing, Bid, Comment
+from .forms import *
 
-class listing_form(forms.Form):
-    title = forms.CharField(label="Title \n")
-    price = forms.IntegerField(label="Starting Price")
-    desc =  forms.CharField(widget=forms.Textarea, label="Something about the Product")
-    image = forms.URLField(label = "Optional URL of the image", required=False)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.helper = FormHelper
-        self.helper.form_method = 'POST'
-        self.helper.layout = Layout(
-            'title',
-            'price',
-            'desc',
-            'image',
-            Submit('submit', 'Submit', css_class = "btn-btn-primary")
-        )
-
-class bid_form(forms.Form):
-    
-    
-    bid = forms.IntegerField(label=" Enter your bid")
-    # def __init__(self,  *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-
-    #     self.helper = FormHelper
-    #     self.helper.form_method = 'POST'
-    #     self.helper.layout = Layout(
-    #         'bid',
-    #         Submit('submit', 'Place Bid', css_class = "btn-btn-primary")
-    #     )
-
-class comment_form(forms.Form):
-    
-    
-    comment = forms.CharField(label=" Comment", widget=forms.Textarea, required=False)
-    def __init__(self,  *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.helper = FormHelper
-        self.helper.form_method = 'POST'
-        self.helper.layout = Layout(
-            'comment',
-            Submit('submit_comment', 'Post comment', css_class = "btn-btn-primary")
-        )
 
 def watch_list(request):
     user = User.objects.get(username=request.user.username)
@@ -65,14 +21,6 @@ def watch_list(request):
         'listings': listings
     })
 
-# def add_comment(request, id):
-#     if request.method == "POST":
-#         form = comment_form(request.POST)
-#         if form.is_valid():
-#             comment = form.cleaned_data['comment']
-#             Comment(listing = Listing.objects.get(id = id), username = request.user, comment = comment).save()
-#     return HttpResponseRedirect("/"+str(id))
-            
 
 
 def remove_watchlist(request, listing_id):

@@ -3,7 +3,9 @@
 
 {% block body %}
     <h2>Create Listings</h2>
+    <div class="form-group">
     {% crispy form form.helper %}
+    </div>
     <!-- <form action = "{% url 'create_listing' %}" method="post">
         {% csrf_token %}
         <div class="form-group" margin=20px>
