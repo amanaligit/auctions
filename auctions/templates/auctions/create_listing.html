@@ -1,0 +1,19 @@
+{% extends "auctions/layout.html" %}
+{%load crispy_forms_tags %}
+
+{% block body %}
+    <h2>Create Listings</h2>
+    {% crispy form form.helper %}
+    <!-- <form action = "{% url 'create_listing' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group" margin=20px>
+        <input type = "text" name="title", placeholder="Enter Title">
+        </div>
+        <input type = "text" name="price", placeholder="Enter price">
+        <input type = "text" name="desc", placeholder="Something about the item">
+        <input type = "text" name="image", placeholder="Optional: enter URL of image">
+        <input type = "submit" class="btn btn-primary">
+    
+    </form> -->
+
+{% endblock %}

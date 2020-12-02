@@ -1,0 +1,37 @@
+{% extends "auctions/layout.html" %}
+{%load crispy_forms_tags %}
+
+{% block body %}
+
+    <h2>Listing: {{listing.title}}</h2>
+    {%if watch_list is False%}
+    <a type="button" class="btn btn-outline-info" href="{% url 'add_watchlist' listing.id %}">Add to WatchList</a>
+    {%endif%}
+
+    {%if watch_list is True%}
+    <a type="button" class="btn btn-outline-danger" href="{% url 'remove_watchlist' listing.id %}">Remove from WatchList</a>
+    {%endif%}
+
+
+    <img src="{{listing.image}}">
+    <h4>{{listing.desc}}</h4>
+    <h3>${{listing.bid}} </h3>
+    <div>
+
+        {{ num_bids }} bid(s) so far. {{ message }}
+        
+    </div>
+    <h3> <b> Details:</b> </h3>
+    <ul>
+        <li>Listed by: {{listing.username}}</li>
+    </ul>
+    {% crispy form form.helper %}
+    <br>
+    {% if response %}
+    <div class="alert alert-danger">
+        <strong>Error!</strong> {{response}}
+      </div>
+    {% endif %}
+    
+
+{% endblock %}

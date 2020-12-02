@@ -2,23 +2,30 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
-    pass
-
 class Listing(models.Model):
-    username = models.ForeignKey(User, on_delete=models.CASCADE)
+    username = models.CharField(max_length=64)
     title = models.CharField(max_length=64)
     bid = models.IntegerField()
     desc = models.CharField(max_length=128)
-    image = models.URLField(blank=True)
+    image = models.URLField(blank=True, null=True)
     time = models.DateTimeField()
+    bid_user = models.CharField(max_length=64)
 
-class comment(models.Model):
+class User(AbstractUser):
+    wishlist = models.ManyToManyField(Listing, null=True, blank = True)
+
+
+
+
+
+
+
+class Comment(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     username = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.CharField(max_length=128)
 
-class bid(models.Model):
+class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="listings")
     username = models.ForeignKey(User, on_delete=models.CASCADE)
     bid = models.IntegerField()
