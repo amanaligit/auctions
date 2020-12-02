@@ -13,7 +13,7 @@ from .models import User, Listing, Bid, Comment
 
 class listing_form(forms.Form):
     title = forms.CharField(label="Title \n")
-    price = forms.IntegerField(label="<br> Starting Price")
+    price = forms.IntegerField(label="Starting Price")
     desc =  forms.CharField(widget=forms.Textarea, label="Something about the Product")
     image = forms.URLField(label = "Optional URL of the image", required=False)
 
@@ -33,25 +33,47 @@ class listing_form(forms.Form):
 class bid_form(forms.Form):
     
     
-    bid = forms.IntegerField(label=" Enter your bid",)
+    bid = forms.IntegerField(label=" Enter your bid")
+    # def __init__(self,  *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+
+    #     self.helper = FormHelper
+    #     self.helper.form_method = 'POST'
+    #     self.helper.layout = Layout(
+    #         'bid',
+    #         Submit('submit', 'Place Bid', css_class = "btn-btn-primary")
+    #     )
+
+class comment_form(forms.Form):
+    
+    
+    comment = forms.CharField(label=" Comment", widget=forms.Textarea, required=False)
     def __init__(self,  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper
         self.helper.form_method = 'POST'
         self.helper.layout = Layout(
-            'bid',
-            Submit('submit', 'Place Bid', css_class = "btn-btn-primary")
+            'comment',
+            Submit('submit_comment', 'Post comment', css_class = "btn-btn-primary")
         )
 
 def watch_list(request):
     user = User.objects.get(username=request.user.username)
     listings = user.wishlist.all()
-    print(user)
-    print(listings)
     return render(request, "auctions/watch_list.html", {
         'listings': listings
     })
+
+# def add_comment(request, id):
+#     if request.method == "POST":
+#         form = comment_form(request.POST)
+#         if form.is_valid():
+#             comment = form.cleaned_data['comment']
+#             Comment(listing = Listing.objects.get(id = id), username = request.user, comment = comment).save()
+#     return HttpResponseRedirect("/"+str(id))
+            
+
 
 def remove_watchlist(request, listing_id):
     user = User.objects.get(username=request.user.username)
@@ -72,7 +94,12 @@ def update_listing(id, price, user):
     listing.bid_user = user.username
     listing.save()
 
-    
+def close(request, listing_id):
+    if request.user.username == Listing.objects.get(pk = listing_id).username:
+        l= Listing.objects.get(id = listing_id)
+        l.closed=True
+        l.save()
+    return HttpResponseRedirect(reverse('listing', args =[listing_id]))
     
 def listing(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
@@ -87,37 +114,41 @@ def listing(request, listing_id):
     if bid_user==request.user.username:
         message = "Your bid is the current bid"
     else:
-        message = "current bid is by: " + bid_user
+        message = "current bid is by: " + str(bid_user)
     if request.method == "POST":
-        form = bid_form(request.POST)
-        if form.is_valid():
-            bid = form.cleaned_data['bid']
-            if bid > listing.bid:
-                Bid(username=request.user, bid = bid, listing = listing).save()
-                update_listing(id=listing_id, price=bid, user = request.user)
-                return HttpResponseRedirect("/"+str(listing_id))
-
-                
-            else:
-                response = "Bid must be greater than the current bid"
-                return render(request, "auctions/listing.html", {'listing': listing,
-             'num_bids': bids,'message': message, 'response': response,
-              'form' : bid_form(), 'comments': comments, 'watch_list': watch_list})
+        if 'submit_comment' in request.POST:
+            form = comment_form(request.POST)
+            if form.is_valid():
+                comment = form.cleaned_data['comment']
+                Comment(listing = Listing.objects.get(id = listing_id), username = request.user, comment = comment).save()
+        elif 'submit_bid' in request.POST:
+            form = bid_form(request.POST)
+            if form.is_valid():
+                bid = form.cleaned_data['bid']
+                if bid > listing.bid:
+                    Bid(username=request.user, bid = bid, listing = listing).save()
+                    update_listing(id=listing_id, price=bid, user = request.user)
+                    return HttpResponseRedirect("/"+str(listing_id))
+                else:
+                    response = "Bid must be greater than the current bid"
+                    return render(request, "auctions/listing.html", {'listing': listing,
+                'num_bids': bids,'message': message, 'response': response,
+                'form' : bid_form(), 'comments': comments, 'watch_list': watch_list, 'comment_form': comment_form()})
             
 
-    return render(request, "auctions/listing.html", {'listing': listing, 'num_bids': bids, 'message': message, 'form' : bid_form(), "comments" : comments, 'watch_list': watch_list})
+    return render(request, "auctions/listing.html", {'listing': listing, 'num_bids': bids, 'message': message, 'bid_form' : bid_form(), "comments" : comments, 'watch_list': watch_list, 'comment_form': comment_form()})
 
     
 
 
 def index(request):
-    return render(request, "auctions/index.html", {'Listings' : Listing.objects.all()})
+    return render(request, "auctions/index.html", {'Listings' : Listing.objects.filter(closed=False)})
 
 def create_listing(request):
     if request.method == 'POST': # If the form has been submitted...
         form = listing_form(request.POST) # A form bound to the POST data
         if form.is_valid():
-            l = Listing(username = request.user.username,title= form.cleaned_data['title'], bid = form.cleaned_data['price'], desc = form.cleaned_data['desc'], image= form.cleaned_data['image'], time = datetime.datetime.now()  )
+            l = Listing(username = request.user.username,title= form.cleaned_data['title'], bid = form.cleaned_data['price'], desc = form.cleaned_data['desc'], image= form.cleaned_data['image'], time = datetime.datetime.now(), closed = False  )
             l.save()
             return HttpResponseRedirect(reverse("index"))
         else:

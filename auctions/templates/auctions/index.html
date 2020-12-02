@@ -3,7 +3,7 @@
 {% block body %}
     <h2>Active Listings</h2>
     {% for listing in Listings%}
-        <H2> {{listing.title}}</H2>
+        <H2><a href={% url 'listing' listing.id %}> {{listing.title}} </a> </H2>
         <h3> price: ${{listing.bid}}</h3>
         <h3> {{listing.desc}}</h3>
         <h3> Created: {{listing.time}}</h3>

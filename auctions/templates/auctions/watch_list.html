@@ -3,7 +3,7 @@
 {% block body %}
     <h2>Your WatchList</h2>
     {% for listing in listings%}
-        <H2> {{listing.title}}</H2>
+        <H2><a href={% url 'listing' listing.id %}> <strong>Listing: </strong> {{listing.title}} </a> </H2>
         <h3> price: ${{listing.bid}}</h3>
         <h3> {{listing.desc}}</h3>
         <h3> Created: {{listing.time}}</h3>

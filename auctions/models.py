@@ -9,7 +9,8 @@ class Listing(models.Model):
     desc = models.CharField(max_length=128)
     image = models.URLField(blank=True, null=True)
     time = models.DateTimeField()
-    bid_user = models.CharField(max_length=64)
+    bid_user = models.CharField(max_length=64, null=True, blank=True)
+    closed = models.BooleanField()
 
 class User(AbstractUser):
     wishlist = models.ManyToManyField(Listing, null=True, blank = True)

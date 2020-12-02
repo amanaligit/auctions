@@ -3,35 +3,89 @@
 
 {% block body %}
 
-    <h2>Listing: {{listing.title}}</h2>
-    {%if watch_list is False%}
-    <a type="button" class="btn btn-outline-info" href="{% url 'add_watchlist' listing.id %}">Add to WatchList</a>
-    {%endif%}
-
-    {%if watch_list is True%}
-    <a type="button" class="btn btn-outline-danger" href="{% url 'remove_watchlist' listing.id %}">Remove from WatchList</a>
-    {%endif%}
+    <h2>Listing: {{listing.title}}
 
 
-    <img src="{{listing.image}}">
-    <h4>{{listing.desc}}</h4>
+    {% ifequal listing.username user.username %}
+    <a type="button" class="btn btn-outline-danger" href="{% url 'close' listing.id %}">Close Bidding</a>
+    {%else%}
+        {%if watch_list is False%}
+        <a type="button" class="btn btn-outline-info" href="{% url 'add_watchlist' listing.id %}">Add to WatchList</a>
+
+        {%else%}
+        <a type="button" class="btn btn-outline-danger" href="{% url 'remove_watchlist' listing.id %}">Remove from WatchList</a>
+        {%endif%}
+        </h2>
+    {%endifequal%}
+
+
+
+
+    <img src="{{listing.image}}" class="rounded mx-auto d-block">
+
+    <h3>Description:</h3>
+    <p>{{listing.desc}}</p>
+    <hr>
     <h3>${{listing.bid}} </h3>
     <div>
 
         {{ num_bids }} bid(s) so far. {{ message }}
         
     </div>
+    <hr>
     <h3> <b> Details:</b> </h3>
     <ul>
+    
         <li>Listed by: {{listing.username}}</li>
     </ul>
-    {% crispy form form.helper %}
+    <hr>
+    {% if listing.closed is False %}
+    <form method="POST" action="{% url 'listing' listing.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+        {{bid_form}}
+        <input class="btn btn-primary" type="submit" value="Place Bid", name = 'submit_bid'>
+        </div>
+    </form>
+    {% else %}
+        {% ifequal user.username listing.bid_user%}
+            <div class="alert alert-success">
+            <strong>Congratulations!</strong> You have won the auction!
+             </div>
+        {% else %}
+        <div class="alert alert-danger">
+        <strong>Sorry!</strong> The Bidding has been closed for this item.
+        </div>
+        {% endifequal %}
+    {% endif %}
+
     <br>
     {% if response %}
     <div class="alert alert-danger">
         <strong>Error!</strong> {{response}}
       </div>
     {% endif %}
-    
+    <hr>
+    <h3>Comments:</h3>
+    <ul>
+    {%for comment in comments%}
+
+    <li><h4>Username: {{comment.username.username}}</h4>
+    <h4> Comment: </h4>
+    <div class="alert alert-secondary" role="alert">
+    <h5> {{comment.comment}} </h5>
+    </div>
+    </li>
+    <hr>
+    {% empty %}
+    <div class="alert alert-dark" role="alert">
+    No comments here. You can post one!
+    </div>
+    {% endfor %}
+    </ul>
+    {% crispy comment_form comment_form.helper %}
+
+
+        
 
 {% endblock %}
