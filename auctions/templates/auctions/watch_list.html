@@ -1,13 +1,26 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Your WatchList</h2>
+    <h2 class="text-center display-4">Your WatchList</h2><hr>
+
     {% for listing in listings%}
-        <H2><a href={% url 'listing' listing.id %}> <strong>Listing: </strong> {{listing.title}} </a> </H2>
-        <h3> price: ${{listing.bid}}</h3>
-        <h3> {{listing.desc}}</h3>
-        <h3> Created: {{listing.time}}</h3>
-        <img src="{{listing.image}}">
-        <hr>
+        <div class="card shadow-lg p-3 mb-5 bg-white rounded ">
+            {% ifnotequal listing.image ""%}
+            <a href={% url 'listing' listing.id %}>
+                <img class="card-img-top" src="{{listing.image}}" alt="Card image cap">
+            </a>
+            {%endifnotequal%}
+            <div class="card-body">
+                <a href={% url 'listing' listing.id %}>
+                    <H3 class='display-5 text-center'> {{listing.title}}</H3>
+                </a>
+                <h4> Current bid: <span class="badge badge-success">${{listing.bid}}</span></h4>
+                <h4>
+                    Description:
+                </h4>
+                <p> {{listing.desc}}</p>
+                <h5 class='display-5 float-right' style="color: grey"> Created: {{listing.time}}</h5>
+            </div>
+        </div>
     {%endfor%}
 {% endblock %}

@@ -3,12 +3,18 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins" />
         <title>{% block title %}Auctions{% endblock %}</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
     </head>
-    <body style=" padding-left:20%; padding-right:20%;  ">
-        <h1>Auctions</h1>
+
+    <body >
+            <h1 class="display-4 text-center " style="background-color:rgb(0, 255, 195);"> <strong>
+                    Auctions
+                </strong>
+            </h1>
+            <div style=" padding-left:20%; padding-right:20%;  ">
         <div>
             {% if user.is_authenticated %}
                 Signed in as <strong>{{ user.username }}</strong>.
@@ -16,7 +22,7 @@
                 Not signed in.
             {% endif %}
         </div>
-        <ul class="nav">
+        <ul class="nav justify-content-center">
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
             </li>
@@ -43,5 +49,6 @@
         <hr>
         {% block body %}
         {% endblock %}
+            </div>
     </body>
 </html>

@@ -3,62 +3,74 @@
 
 {% block body %}
 
-    <h2>Listing: {{listing.title}}
+    <h2 class="display-5 font-weight-bold"> Listing: {{listing.title}}
 
 
     {% if listing.username == user.username and listing.closed is False%}
     <a type="button" class="btn btn-outline-danger" href="{% url 'close' listing.id %}">Close Bidding</a>
 
     {%endif%}
+
+    {%if user.is_authenticated %}
         {%if watch_list is False%}
-        <a type="button" class="btn btn-outline-info" href="{% url 'add_watchlist' listing.id %}">Add to WatchList</a>
+        <a type="button" class="btn btn-outline-info float-right" href="{% url 'add_watchlist' listing.id %}">Add to WatchList</a>
 
         {%else%}
-        <a type="button" class="btn btn-outline-danger" href="{% url 'remove_watchlist' listing.id %}">Remove from WatchList</a>
+        <a type="button" class="btn btn-outline-danger float-right"
+            href="{% url 'remove_watchlist' listing.id %}">Remove from WatchList</a>
         {%endif%}
-        </h2>
+    {%endif%}
 
 
 
 
-    <img src="{{listing.image}}" class="rounded mx-auto d-block">
+    <img src="{{listing.image}}" class=" mx-auto d-block img-listing">
 
-    <h3>Description:</h3>
+    <h3 class="display-5 font-weight-bold">Description:</h3>
     <p>{{listing.desc}}</p>
     <hr>
-    <h3>${{listing.bid}} </h3>
-    <div>
+    
+    <h3 class='display-4 text-center'> <strong> Current Bid</strong> <span
+            class="badge badge-success">${{listing.bid}}</span> </h3>
+    <div class = "alert alert-info text-center">
 
         {{ num_bids }} bid(s) so far. {{ message }}
         
     </div>
     <hr>
-    <h3> <b> Details:</b> </h3>
-    <ul>
-    
-        <li>Listed by: {{listing.username}}</li>
-    </ul>
+    <h3 class="display-5 font-weight-bold"> Listed by: <span class="badge badge-primary"> {{listing.username}}</span>
+       </h3>
+
     <hr>
+
     {% if listing.closed is False %}
-    <form method="POST" action="{% url 'listing' listing.id %}">
-        {% csrf_token %}
-        <div class="form-group">
-        {{bid_form}}
-        <input class="btn btn-primary" type="submit" value="Place Bid", name = 'submit_bid'>
-        </div>
-    </form>
+        {%if user.is_authenticated %}
+        <h3 class="display-5 font-weight-bold"> Place a bid: </h3>
+            <form method="POST" action="{% url 'listing' listing.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                {{bid_form}}
+                <input class="btn btn-primary" type="submit" value="Place Bid", name = 'submit_bid'>
+                </div>
+            </form>
+        {%else%}
+            <div class="alert alert-danger text-center" role="alert">
+                Please login to post bids!
+            </div>
+        {%endif%}
+
     {% else %}
         {% ifequal user.username listing.bid_user%}
-            <div class="alert alert-success">
+            <div class="alert alert-success text-center">
             <strong>Congratulations!</strong> You have won the auction!
              </div>
         {% else %}
         {% ifequal user.username listing.username%}
-            <div class="alert alert-secondary">
+            <div class="alert alert-secondary text-center">
             You have closed the bidding for this item
             </div>
         {%else%}
-            <div class="alert alert-danger">
+            <div class="alert alert-danger text-center">
             <strong>Sorry!</strong> The Bidding has been closed for this item.
             </div>
         {% endifequal%}
@@ -72,25 +84,29 @@
       </div>
     {% endif %}
     <hr>
-    <h3>Comments:</h3>
+    <h3 class="display-5 font-weight-bold">Comments:</h3>
     <ul>
     {%for comment in comments%}
 
     <li><h4>Username: {{comment.username.username}}</h4>
-    <h4> Comment: </h4>
     <div class="alert alert-secondary" role="alert">
     <h5> {{comment.comment}} </h5>
     </div>
     </li>
     <hr>
     {% empty %}
-    <div class="alert alert-dark" role="alert">
+    <div class="alert alert-dark text-center" role="alert">
     No comments here. You can post one!
     </div>
     {% endfor %}
     </ul>
-    {% crispy comment_form comment_form.helper %}
-
+    {% if user.is_authenticated %}
+        {% crispy comment_form comment_form.helper %}
+    {%else%}
+    <div class="alert alert-danger text-center" role="alert">
+        Please login to post comments!
+    </div>
+    {%endif%}
 
         
 
